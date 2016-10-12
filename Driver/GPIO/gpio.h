@@ -8,19 +8,22 @@ extern "C" {
 /********************************************************************************************************
   PORT Configuration
 ********************************************************************************************************/
-#define PTA               A
-#define PTB               B
-#define PTC               C
-#define PTD               D
-#define PTE               E
+#define PT_A               A
+#define PT_B               B
+#define PT_C               C
+#define PT_D               D
+#define PT_E               E
 
 /*
  * Clock configuration for Port module
  */ 
-#define PORT_ENABLE_CLK(PTx)    SIM_SCGC5 |=  SIM_SCGC5_PORT##PTx##_MASK  
-#define PORT_DISABLE_CLK(PTx)   SIM_SCGC5 &= ~SIM_SCGC5_PORT##PTx##_MASK
+#define V_PORT_ENABLE_CLK(V_PTO)    SIM_SCGC5 |=  SIM_SCGC5_PORT##V_PTO##_MASK 
+#define V_PORT_DISABLE_CLK(V_PTO)   SIM_SCGC5 &= ~SIM_SCGC5_PORT##V_PTO##_MASK
 
+#define PORT_ENABLE_CLK(PTO)        V_PORT_ENABLE_CLK(PTO)
+#define PORT_DISABLE_CLK(PTO)       V_PORT_DISABLE_CLK(PTO)
 
+void led_Gpio_Init(void);
 
 
 #ifdef __cplusplus

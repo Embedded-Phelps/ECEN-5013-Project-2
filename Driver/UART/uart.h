@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "includes.h"
 /*********************************************************************************************************
   Macro
 *********************************************************************************************************/
@@ -95,7 +96,7 @@ extern "C" {
 /*********************************************************************************************************
   Functions Declaration 
 *********************************************************************************************************/  
-extern void uart0Init( uint32_t ulBaudRate,
+extern void uart0_Init( uint32_t ulBaudRate,
 					   uint8_t  ucParityEnable,
 					   uint8_t  ucParityType,
 					   uint8_t  ucDataLength,
@@ -106,9 +107,9 @@ extern void uart0_TranCtl( uint8_t ucTxEnable,
 						   
 extern uint8_t uart0_GetChar(void);
 
-extern void uart0_SendChar(uint8_t ucCh);
+extern void uart0_SendChar(int8_t ucCh);
 
-extern void uart0_SendString(uint8_t *pData);
+extern void uart0_SendString(int8_t *pData);
 
 extern void UART0_IRQHandler(void);	//called where?
 

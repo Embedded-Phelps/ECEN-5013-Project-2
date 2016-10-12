@@ -1,4 +1,7 @@
-#include "include.h"
+#include "includes.h"
+
+#define DEFAULT_BUS_CLOCK         24000000u
+uint32_t SystemBusClock = DEFAULT_BUS_CLOCK;
 
 void uart0_Init( uint32_t ulBaudRate,
 				 uint8_t  ucParityEnable,
@@ -11,8 +14,8 @@ void uart0_Init( uint32_t ulBaudRate,
 	
 	/* Configure clock for UART0*/
 	SIM_SOPT2 |= SIM_SOPT2_PLLFLLSEL_MASK; 
-    SIM_SOPT2 |= SIM_SOPT2_UART0SRC(1);                      
-    SIM_SCGC4 |= SIM_SCGC4_UART0_MASK; 
+  SIM_SOPT2 |= SIM_SOPT2_UART0SRC(1);                      
+  SIM_SCGC4 |= SIM_SCGC4_UART0_MASK; 
 	
 	//maybe add param check
 	
@@ -20,8 +23,8 @@ void uart0_Init( uint32_t ulBaudRate,
 	uart0_TranCtl(UART_TX_DISABLE, UART_RX_DISABLE);
 	
 	/* Configure pin for UART0 */
-	PORT_PCR1 = PORT_PCR_MUX(0x2);		//maybe integrate this into gpio.h
-	PORT_PCR2 = PORT_PCR_MUX(0x2);
+	PORTA_PCR1 = PORT_PCR_MUX(0x2);		//maybe integrate this into gpio.h
+	PORTA_PCR2 = PORT_PCR_MUX(0x2);
 	
 	/* Configure parity and data length */
 	UART0_C1_REG(uartPtr) &= ~(UART0_C1_M_MASK |            
@@ -60,7 +63,7 @@ void uart0_Init( uint32_t ulBaudRate,
 		uart0_TranCtl(UART_TX_ENABLE, UART_RX_ENABLE);
 	#endif
 	
-	#if UART_ISR_ENABLE
+	#if UART0_IRQ_ENABLE
 		#if UART0_SEND_IRQ
         UART0_C2_REG(uartPtr) |= UART0_C2_TCIE_MASK;
         #endif
@@ -91,7 +94,7 @@ uint8_t uart0_GetChar(void)
     return UART0_D_REG(uartPtr);                                                /* 返回接收字节         */
 }
 
-void uart0_SendChar(uint8_t ucCh)
+void uart0_SendChar(int8_t ucCh)
 {
     UART0_MemMapPtr uartPtr = UART0_BASE_PTR;
 
@@ -99,7 +102,7 @@ void uart0_SendChar(uint8_t ucCh)
     UART0_D_REG(uartPtr) = ucCh;                                              /* 填充数据寄存器       */
 }
 
-void uart0_SendString(uint8_t *pData)
+void uart0_SendString(int8_t *pData)
 {
     while (*pData != '\0') { 
         uart0_SendChar(*pData++);
@@ -114,8 +117,8 @@ void UART0_IRQHandler(void)
                                                                                /* 用户定义             */    
    #endif
    #if UART0_RECEIVE_IRQ
-   //while(UART0_S1_REG(uartPtr) & UART0_S1_RDRF_MASK){                          /* 清除中断标志         */
-   //uart0SendChar(UART0_D_REG(uartPtr));                                    /* 返回接收数据         */
+   while(UART0_S1_REG(uartPtr) & UART0_S1_RDRF_MASK){                          /* 清除中断标志         */
+   uart0_SendChar(UART0_D_REG(uartPtr));                                    /* 返回接收数据         */
    //while(!UART0_D_REG(uartPtr));                                           /* 清接收缓冲区         */
    }   
    #endif
