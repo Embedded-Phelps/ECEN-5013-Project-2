@@ -1,7 +1,13 @@
 #include "includes.h"
 
+#define RCIF (UART0->S1 & UARTLP_S1_RDRF_MASK) // Receive Interrupt Flag (full)
+#define RCREG UART0->D 
+
 #define DEFAULT_BUS_CLOCK         24000000u
 uint32_t SystemBusClock = DEFAULT_BUS_CLOCK;
+uint8_t serial_flag=0;
+uint8_t rx_in[30];
+uint8_t * rx_in_ptr=rx_in;
 
 void uart0_Init( uint32_t ulBaudRate,
 				 uint8_t  ucParityEnable,
@@ -111,15 +117,30 @@ void uart0_SendString(int8_t *pData)
 
 void UART0_IRQHandler(void)
 {     
-   UART0_MemMapPtr uartPtr = UART0_BASE_PTR;  
+	 UART0_MemMapPtr uartPtr = UART0_BASE_PTR;  
    #if UART0_SEND_IRQ
                                                                                /* 发送中断处理程序     */
                                                                                /* 用户定义             */    
    #endif
    #if UART0_RECEIVE_IRQ
    while(UART0_S1_REG(uartPtr) & UART0_S1_RDRF_MASK){                          /* 清除中断标志         */
-   uart0_SendChar(UART0_D_REG(uartPtr));                                    /* 返回接收数据         */
-   //while(!UART0_D_REG(uartPtr));                                           /* 清接收缓冲区         */
+		 * rx_in_ptr = UART0_D_REG(uartPtr);
+		
+		 /*if((*rx_in_ptr=='w')||(*rx_in_ptr=='s')){
+				uart0_SendChar(*rx_in_ptr);
+				serial_flag=1;
+		 }*/
+		 if(*rx_in_ptr != '\r'){
+				//uart0_SendChar(*rx_in_ptr);
+				rx_in_ptr++;
+		 }
+		 else{
+			*rx_in_ptr='\0';
+			serial_flag=1;
+			rx_in_ptr=rx_in;
+		}
+		//while(!UART0_D_REG(uartPtr));                                           /* 清接收缓冲区         */
    }   
    #endif
 }
+ 

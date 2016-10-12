@@ -44,7 +44,7 @@ extern "C" {
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-
+#include <time.h>
 
 /*********************************************************************************************************
   Common's header files  公共头文件 
@@ -52,9 +52,6 @@ extern "C" {
 #include "MKL25Z4.h"
 #include "system_MKL25Z4.h"
 
-/* * * * * * * * 暂时使用* * * * * * * * */
-
-//#include <core_cm0.h>                                                   /* CMSIS File of Cortex-M0      */
 
 /*********************************************************************************************************
   Driver's header files  驱动头文件 
@@ -69,8 +66,11 @@ extern "C" {
 *********************************************************************************************************/
 //#include "..\App\main.h"
 #include "data.h"
+#include "memory.h"
+#include "profiler.h"
 
 
+#define TIME_PER_CYCLE		41.6666666
 
 #ifdef __cplusplus
 }

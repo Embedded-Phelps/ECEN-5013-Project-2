@@ -42,3 +42,14 @@ void tpm_Init(void)
     TPM0_SC   = TPM_SC_CMOD(1) | TPM_SC_PS(0);                          /* Edge Aligned PWM running from 
 																		   BUSCLK / 1                   */
 }
+
+void pit_Init(void){
+    SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;                                    /* Enable clock gate to the PIT module                     */
+    PIT_MCR &= ~(1 << PIT_MCR_MDIS_SHIFT);                              /* Enable clock for standard PIT timer                     */
+    PIT_MCR |= PIT_MCR_FRZ_MASK;
+		PIT_LDVAL0 = 240;                                              		/* Initial value for 10us period                */
+    PIT_TFLG0 |= PIT_TFLG_TIF_MASK;                                     /* Clear Timer Interrupt Flag                   */
+    PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;               										/* Enable Timer Interrupt     */
+		NVIC_EnableIRQ(PIT_IRQn);   													
+		NVIC_SetPriority(PIT_IRQn,2);                                       /* Setting Interrupt priority           */
+}
