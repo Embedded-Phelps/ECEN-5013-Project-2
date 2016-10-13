@@ -25,11 +25,11 @@ void tpm_Init(void)
     PORTB_PCR19 = ( 0 | PORT_PCR_MUX(3));                                /* TPM2_CH1 enable on PTB19    */
     PORTD_PCR1  = ( 0 | PORT_PCR_MUX(4));                                /* TPM0_CH1 enable on PTD1     */
 
-    TPM0_MOD  = TPM_MODULE;                                              /* 1999 / 50MHz = 40uS PWM     */
+    TPM0_MOD  = TPM_MODULE;                                              /* 1999 / 24MHz = 80uS PWM     */
     TPM0_C1SC = TPM_Cn_MODE;                                             /* No Interrupts; High True 
                                                                              pulses on Edge Aligned PWM */
     TPM0_C1V  = TPM_INIT_VAL;                                            /* 90% pulse width             */
-    TPM2_MOD  = TPM_MODULE;                                              /* 1999 / 50MHz = 40uS PWM     */
+    TPM2_MOD  = TPM_MODULE;                                              /* 1999 / 24MHz = 80uS PWM     */
     TPM2_C0SC = TPM_Cn_MODE;                                             /* No Interrupts; Low True 
                                                                             pulses on Edge Aligned PWM  */
     TPM2_C0V  = TPM_INIT_VAL;                                            /* 90% pulse width             */
@@ -44,12 +44,12 @@ void tpm_Init(void)
 }
 
 void pit_Init(void){
-    SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;                                    /* Enable clock gate to the PIT module                     */
-    PIT_MCR &= ~(1 << PIT_MCR_MDIS_SHIFT);                              /* Enable clock for standard PIT timer                     */
+    SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;          /* Enable clock gate to the PIT module  */
+    PIT_MCR &= ~(1 << PIT_MCR_MDIS_SHIFT);    /* Enable clock for standard PIT timer */
     PIT_MCR |= PIT_MCR_FRZ_MASK;
-		PIT_LDVAL0 = 240;                                              		/* Initial value for 10us period                */
-    PIT_TFLG0 |= PIT_TFLG_TIF_MASK;                                     /* Clear Timer Interrupt Flag                   */
-    PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;               										/* Enable Timer Interrupt     */
+		PIT_LDVAL0 = 240;                         /* Initial value for 10us period  */
+    PIT_TFLG0 |= PIT_TFLG_TIF_MASK;           /* Clear Timer Interrupt Flag  */
+    PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;         /* Enable Timer Interrupt   */
 		NVIC_EnableIRQ(PIT_IRQn);   													
-		NVIC_SetPriority(PIT_IRQn,2);                                       /* Setting Interrupt priority           */
+		NVIC_SetPriority(PIT_IRQn,2);             /* Setting Interrupt priority */
 }

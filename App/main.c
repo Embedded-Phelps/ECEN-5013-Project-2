@@ -26,17 +26,18 @@ int main(){
 	
 	/* Initialize uart0 */
 	uart0_Init(9600,0,0,8,1);
-	
+	//uart0_SendString("For this part, you will have to take the Circular buffer code you have written\n\r in the previous assignments and this lab and connect it into our UART interface.\n\r");
 	/* Initialize LED GPIO */
-	led_Gpio_Init();
+	//led_Gpio_Init();
 	
 	/* Initialize TPM */
-	tpm_Init();
+	//tpm_Init();
 	
 	/* Initialize PIT */
 	pit_Init();
-	//PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
-	//time_Profiler();
+
+	time_Profiler();
+	/*
 	Log("Testing123, Serial Print Test, no params\r\n", 42);
 	Log_Uint32("This is an integer: ", 20, &test1);
 	Log("\r\n",2);
@@ -45,7 +46,7 @@ int main(){
 	Log_Uint32("This is an integer: ", 20, &test3);
 	Log("\r\n",2);
 	Log_float("This is an integer: ", 20, &test4);
-	Log("\r\n",2);
+	Log("\r\n",2);*/
 	
 	
 	//Log("Please set LED brightness", 25);
