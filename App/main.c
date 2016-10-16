@@ -36,7 +36,7 @@ int main(){
 	/* Initialize PIT */
 	pit_Init();
 
-	//time_Profiler();
+	//rtime_Profiler();
 	/*
 	Log("Testing123, Serial Print Test, no params\r\n", 42);
 	Log_Uint32("This is an integer: ", 20, &test1);
