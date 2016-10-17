@@ -1,11 +1,5 @@
-#include "includes.h"
+#include "includes.h" 
 
-#define RCIF (UART0->S1 & UARTLP_S1_RDRF_MASK) // Receive Interrupt Flag (full)
-#define RCREG UART0->D 
-
-#define DEFAULT_BUS_CLOCK         24000000u
-uint32_t SystemBusClock = DEFAULT_BUS_CLOCK;
-uint8_t serial_flag=0;
 uint8_t rx_in[30];
 uint8_t * rx_in_ptr=rx_in;
 
@@ -20,8 +14,8 @@ void uart0_Init( uint32_t ulBaudRate,
 	
 	/* Configure clock for UART0*/
 	SIM_SOPT2 |= SIM_SOPT2_PLLFLLSEL_MASK; 
-  SIM_SOPT2 |= SIM_SOPT2_UART0SRC(1);                      
-  SIM_SCGC4 |= SIM_SCGC4_UART0_MASK; 
+	SIM_SOPT2 |= SIM_SOPT2_UART0SRC(1);                      
+	SIM_SCGC4 |= SIM_SCGC4_UART0_MASK; 
 	
 	//maybe add param check
 	
@@ -70,16 +64,14 @@ void uart0_Init( uint32_t ulBaudRate,
 	#endif
 	
 	#if UART0_IRQ_ENABLE
-		#if UART0_SEND_IRQ
-        UART0_C2_REG(uartPtr) |= UART0_C2_TCIE_MASK;
-        #endif
-        #if UART0_RECEIVE_IRQ
-        UART0_C2_REG(uartPtr) |= UART0_C2_RIE_MASK;
-        #endif                
+        UART0_C2_REG(uartPtr) |= UART0_C2_RIE_MASK;      
 		NVIC_EnableIRQ(UART0_IRQn);
 		NVIC_SetPriority(UART0_IRQn,3); 
 	#endif
 	
+	/* Initialize TX and RX circular buffer */
+	tx_buf=cb_Init(tx_buf, 50);
+	rx_buf=cb_Init(rx_buf, 50);
 }
 
 void uart0_TranCtl(uint8_t ucTxEnable, 
@@ -91,21 +83,21 @@ void uart0_TranCtl(uint8_t ucTxEnable,
     UART0_C2_REG(uartPtr) |= (ucTxEnable << UART0_C2_TE_SHIFT)|
                              (ucRxEnable << UART0_C2_RE_SHIFT);
 }
-
+/*
 uint8_t uart0_GetChar(void)
 {
     UART0_MemMapPtr uartPtr = UART0_BASE_PTR;
 
-    while (!(UART0_S1_REG(uartPtr) & UART0_S1_RDRF_MASK));                      /* 等待接收缓冲区可用   */
-    return UART0_D_REG(uartPtr);                                                /* 返回接收字节         */
+    while (!(UART0_S1_REG(uartPtr) & UART0_S1_RDRF_MASK));                   
+    return UART0_D_REG(uartPtr);                                              
 }
 
 void uart0_SendChar(int8_t ucCh)
 {
     UART0_MemMapPtr uartPtr = UART0_BASE_PTR;
 
-    while(!((UART0_S1_REG(uartPtr) & UART0_S1_TDRE_MASK)));                     /* 等待FIFO可用         */
-    UART0_D_REG(uartPtr) = ucCh;                                              /* 填充数据寄存器       */
+    while(!((UART0_S1_REG(uartPtr) & UART0_S1_TDRE_MASK)));                  
+    UART0_D_REG(uartPtr) = ucCh;                                           
 }
 
 void uart0_SendString(int8_t *pData)
@@ -114,33 +106,24 @@ void uart0_SendString(int8_t *pData)
         uart0_SendChar(*pData++);
     }    
 }
+*/
 
 void UART0_IRQHandler(void)
 {     
-	 UART0_MemMapPtr uartPtr = UART0_BASE_PTR;  
-   #if UART0_SEND_IRQ
-                                                                               /* 发送中断处理程序     */
-                                                                               /* 用户定义             */    
-   #endif
-   #if UART0_RECEIVE_IRQ
-   while(UART0_S1_REG(uartPtr) & UART0_S1_RDRF_MASK){                          /* 清除中断标志         */
-		 * rx_in_ptr = UART0_D_REG(uartPtr);
-		
-		 /*if((*rx_in_ptr=='w')||(*rx_in_ptr=='s')){
-				uart0_SendChar(*rx_in_ptr);
-				serial_flag=1;
-		 }*/
-		 if(*rx_in_ptr != '\r'){
-				//uart0_SendChar(*rx_in_ptr);
-				rx_in_ptr++;
-		 }
-		 else{
-			*rx_in_ptr='\0';
-			serial_flag=1;
-			rx_in_ptr=rx_in;
-		}
-		//while(!UART0_D_REG(uartPtr));                                           /* 清接收缓冲区         */
+	UART0_MemMapPtr uartPtr = UART0_BASE_PTR;  
+	
+	__asm("cpsid i");
+	
+	if(((UART0_S1_REG(uartPtr) & UART0_S1_TDRE_MASK))&&(cb_IsEmpty(tx_buf)!=EMPTY)){
+		cb_Dequeue(tx_buf, &UART0_D_REG(uartPtr));
+		if(cb_IsEmpty(tx_buf)==EMPTY)
+			UART0_C2_REG(uartPtr) &= ~UART0_C2_TIE_MASK;
+   }                                                                           
+                                                                                  
+   if((UART0_S1_REG(uartPtr) & UART0_S1_RDRF_MASK)&&(cb_IsFull(rx_buf)!=FULL)){                        
+		cb_Enqueue(rx_buf, (uint8_t)UART0_D_REG(uartPtr));
    }   
-   #endif
+   
+   __asm("cpsie i");
 }
  
