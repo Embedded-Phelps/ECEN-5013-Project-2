@@ -12,15 +12,12 @@ extern "C" {
 
 #define UART0_DEFAULT_OPEN      1                                                                              
 #define UART0_IRQ_ENABLE        1                                              
+#define UART_TX_ENABLE          1
+#define UART_TX_DISABLE         0
+#define UART_RX_ENABLE          1
+#define UART_RX_DISABLE         0
 
-#define DEFAULT_BUS_CLOCK         24000000u
-
-/*********************************************************************************************************
-  Variable
-*********************************************************************************************************/
-uint32_t SystemBusClock = DEFAULT_BUS_CLOCK;
-uint8_t serial_flag=0;
-CircBuf_t * tx_buf, rx_buf;
+#define DEFAULT_BUS_CLOCK       24000000u
 
 /*********************************************************************************************************
   Functions Declaration 

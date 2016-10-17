@@ -122,5 +122,5 @@ void cb_Fill_Buff(CircBuf_t * cb);
  *@description Perform the unit test of circular buffer functions 
  *             
  */
-void circBuf_UnitTest();
+void circBuf_UnitTest(void);
 #endif /* CIRCBUF_H*/

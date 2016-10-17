@@ -40,7 +40,7 @@ CB_e cb_Dequeue(CircBuf_t * cb, uint8_t *output){
 
 CircBuf_t * cb_Init(CircBuf_t * cb, uint32_t num_items){
 	cb= (CircBuf_t *)malloc(sizeof(CircBuf_t));
-	cb->buffer = (uint8_t *)malloc(num_items);
+	cb->buffer = (uint8_t *)malloc(sizeof(uint8_t)*num_items);
 	cb->size = num_items;
 	cb->head = cb->buffer;
 	cb->tail = cb->buffer;

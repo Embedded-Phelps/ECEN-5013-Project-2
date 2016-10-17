@@ -30,9 +30,9 @@
 * @return: pointer to the string
 */
 
-int8_t * my_itoa(int8_t *str, int32_t data, int32_t base){
+uint8_t * my_itoa(uint8_t *str, int32_t data, int32_t base){
     int32_t pw, temp;
-    int8_t * result = str;
+    uint8_t * result = str;
 		if (str == NULL)
         return NULL;
     if((base == 10)&&(data < 0)){
