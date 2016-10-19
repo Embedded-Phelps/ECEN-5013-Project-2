@@ -1,3 +1,11 @@
+/***************************************************************************
+ *
+ *	Filename: 		gpio.c
+ *  Description:  	KL25Z GPIO functions prototype header file
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
 #ifndef __GPIO__H
 #define __GPIO__H
 

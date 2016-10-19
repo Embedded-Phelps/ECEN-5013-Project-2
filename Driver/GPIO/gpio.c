@@ -1,7 +1,16 @@
+/***************************************************************************
+ *
+ *	Filename: 		gpio.c
+ *  Description:  	KL25Z GPIO functions implementation
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
+ 
 #include "includes.h"
+
 void led_Gpio_Init(void) 
 {
-    //SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTD_MASK ;
 
     PORTB_PCR18 |= (PORT_PCR_MUX(1) | PORT_PCR_DSE_MASK);               /* Red LED: GPIO, digital output */
     PORTB_PCR19 |= (PORT_PCR_MUX(1) | PORT_PCR_DSE_MASK);               /* GREENLED: GPIO, digital output*/

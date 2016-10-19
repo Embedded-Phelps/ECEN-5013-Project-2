@@ -1,11 +1,18 @@
+/***************************************************************************
+ *
+ *	Filename: 		uart.c
+ *  Description:  	uart driver function implementation
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
+ 
 #include "includes.h" 
 
 uint32_t SystemBusClock = DEFAULT_BUS_CLOCK;
-uint8_t serial_flag=0;
+
 CircBuf_t * tx_buf; 
 CircBuf_t * rx_buf;
-uint8_t rx_in[30];
-uint8_t * rx_in_ptr=rx_in;
 
 void uart0_Init( uint32_t ulBaudRate,
 				 uint8_t  ucParityEnable,
@@ -26,19 +33,19 @@ void uart0_Init( uint32_t ulBaudRate,
 	uart0_TranCtl(UART_TX_DISABLE, UART_RX_DISABLE);
 	
 	/* Configure pin for UART0 */
-	PORTA_PCR1 = PORT_PCR_MUX(0x2);		//maybe integrate this into gpio.h
+	PORTA_PCR1 = PORT_PCR_MUX(0x2);	
 	PORTA_PCR2 = PORT_PCR_MUX(0x2);
 	
 	/* Configure parity and data length */
 	UART0_C1 &= ~(UART0_C1_M_MASK |            
                UART0_C1_PT_MASK |                                
                UART0_C1_PE_MASK);                                
-  UART0_C4 &= ~UART0_C4_M10_MASK; 
-  if (ucDataLength == 10) {  
+	UART0_C4 &= ~UART0_C4_M10_MASK; 
+	if (ucDataLength == 10) {  
 		UART0_C1 |= (ucParityEnable << UART0_C1_PE_SHIFT)|
                 (ucParityType << UART0_C1_PT_SHIFT);
 		UART0_C4 |= UART0_C4_M10_MASK;   
-  } 
+	} 
 	else {
     UART0_C1 |= ((ucDataLength - 8UL) << UART0_C1_M_SHIFT)|
                               (ucParityEnable << UART0_C1_PE_SHIFT)|
@@ -52,7 +59,7 @@ void uart0_Init( uint32_t ulBaudRate,
 	
 	/* Configure stop bit */
 	UART0_BDH &= ~UART0_BDH_SBNS_MASK;                            
-  UART0_BDH |= (ucStopBit - 1) << UART0_BDH_SBNS_SHIFT;
+	UART0_BDH |= (ucStopBit - 1) << UART0_BDH_SBNS_SHIFT;
 	
 	/* Clear interrupt settings */
 	UART0_C2  &= ~(UART0_C2_TIE_MASK | UART0_C2_TCIE_MASK |      

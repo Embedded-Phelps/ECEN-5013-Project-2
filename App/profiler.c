@@ -1,12 +1,21 @@
+/***************************************************************************
+ *
+ *	Filename: 		profiler.c
+ *  Description:  	Time profiling a series of function
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
+ 
 #include "includes.h"
 
 int32_t num_pit_overflow=0;
 
 void PIT_IRQHandler(void){
     PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;					// Disable PIT Timer
-		PIT_TFLG0 |= PIT_TFLG_TIF_MASK;             // Clear Timer Interrupt Flag */
+		PIT_TFLG0 |= PIT_TFLG_TIF_MASK;             	// Clear Timer Interrupt Flag */
 		num_pit_overflow++;
-    PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;						//Enable PIT Timer
+    PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;					//Enable PIT Timer
 }
 
 
@@ -15,7 +24,6 @@ void time_Profiler_Memmove(int32_t bytes){
 	uint8_t *destination = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
 	uint8_t n;
 	
-	/* Testing my_memmove()&memmove() */
 #ifdef _BBB
 	struct timeval start, finish;
 	int32_t nsec=0;
@@ -100,7 +108,6 @@ void time_Profiler_Memset(int32_t bytes){
 	uint8_t n;
 	uint8_t *source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
 	
-	/* Testing my_memzero()&memset() */
 #ifdef _BBB
 	struct timeval start, finish;
 	int32_t nsec=0;
@@ -182,7 +189,6 @@ void time_Profiler_Reverse(int32_t bytes){
 	uint8_t n;
 	uint8_t *source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
 
-	/* Testing my_reverse()*/
 #ifdef _BBB
 	struct timeval start, finish;
 	int32_t nsec=0;
@@ -195,11 +201,10 @@ void time_Profiler_Reverse(int32_t bytes){
 	nsec /= 2;
 	log_Int("Number of bytes: ", bytes);
 	log_Str("\r\n");
-	Log_Int("Time of my_reverse(): ", nsec);
+	log_Int("Time of my_reverse(): ", nsec);
 	log_Str(" microsec\r\n");
 	
 #else 
-	/* Testing my_reverse()& reverse() */
 	int32_t cycle_avg=0;
 	int32_t cycle=0;
 	float time=0.0;
@@ -233,7 +238,6 @@ void time_Profiler_itoa(int32_t data){
 	uint8_t n;
 	uint8_t *str = (uint8_t *)malloc(sizeof(uint8_t)*20);	
 	
-	/* Testing my_itoa()& itoa() */
 #ifdef _BBB
 	struct timeval start, finish;
 	int32_t nsec=0;
@@ -244,8 +248,6 @@ void time_Profiler_itoa(int32_t data){
 		nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
 	}
 	nsec /= 2;
-	log_Int("Number of bytes: ", bytes);
-	log_Str("\r\n");
 	log_Int("Time of my_itoa(): ", nsec);
 	log_Str(" microsec\r\n");
 	nsec=0;
@@ -278,7 +280,7 @@ void time_Profiler_itoa(int32_t data){
 	}
 	cycle_avg /= 3;
 	time = cycle_avg * TIME_PER_CYCLE;
-	//LOGGING
+
 	log_Int("CPU cycles of my_itoa(): ", cycle_avg);
 	log_Str("\r\n");
 	log_Float("Time of my_itoa(): ", time);
@@ -292,7 +294,6 @@ void time_Profiler_ftoa(float data){
 	uint8_t n;	
 	uint8_t *str = (uint8_t *)malloc(sizeof(uint8_t)*32);
 
-	/* Testing my_ftoa()& sprintf() */
 #ifdef _BBB
 	struct timeval start, finish;
 	int32_t nsec=0;	
@@ -303,8 +304,6 @@ void time_Profiler_ftoa(float data){
 		nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
 	}
 	nsec /= 2;
-	log_Int("Number of bytes: ", bytes);
-	log_Str("\r\n");
 	log_Int("Time of my_ftoa(): ", nsec);
 	log_Str(" microsec\r\n");
 	nsec=0;
@@ -317,7 +316,7 @@ void time_Profiler_ftoa(float data){
 	}
 	nsec /= 2;
 	log_Int("Time of sprintf(): ", nsec);
-	log_Str(" microsec\r\n",11);
+	log_Str(" microsec\r\n");
 	
 #else 
 	int32_t cycle_avg=0;
@@ -349,7 +348,6 @@ void time_Profiler_ftoa(float data){
 void time_Profiler_atoi(int8_t * str){
 	uint8_t n;
 	
-	/* Testing my_atoi()& atoi() */
 #ifdef _BBB
 	struct timeval start, finish;
 	int32_t nsec=0;	
@@ -407,49 +405,37 @@ void time_Profiler_MallocFree_Empty(int32_t bytes){
 #ifdef _BBB
 	struct timeval start, finish;
 	int32_t nsec=0;
-	for(n=0;n<2;n++){
-		gettimeofday(&start, NULL);
-		source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
-		gettimeofday(&finish, NULL);
-		nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
-	}
-	nsec /= 2;
+	gettimeofday(&start, NULL);
+	source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
+	gettimeofday(&finish, NULL);
+	nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
 	log_Int("Number of bytes: ", bytes);
 	log_Str("\r\n");
 	Log_Int("Time of malloc(): ", nsec);
 	log_Str(" microsec\r\n");
 	
 	nsec=0;
-	for(n=0;n<2;n++){
-		gettimeofday(&start, NULL);
-		free(source);
-		gettimeofday(&finish, NULL);
-		nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
-	}
-	nsec /= 2;
+	gettimeofday(&start, NULL);
+	free(source);
+	gettimeofday(&finish, NULL);
+	nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
 
-	Log_Int("Time of free(): ", nsec);
+	log_Int("Time of free(): ", nsec);
 	log_Str(" microsec\r\n");
-#else 
 
+#else 
 	int32_t cycle_avg=0;
 	int32_t cycle=0;
 	float time=0.0;
-	for(n=0;n<3;n++){
-		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
-		source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
-		cycle += PIT_CVAL0;
-		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
-		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
-		num_pit_overflow=0;
-		cycle=0;
-	}
-	cycle_avg /= 3;
+	PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+	source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
+	cycle += PIT_CVAL0;
+	PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+	cycle += (num_pit_overflow*240);
+	cycle_avg += cycle;	
+	num_pit_overflow=0;
+	cycle=0;
 	time = cycle_avg * TIME_PER_CYCLE;
-
 	log_Int("Number of bytes: ", bytes);
 	log_Str("\r\n");
 	log_Int("CPU cycles of malloc(): ", cycle_avg);
@@ -459,21 +445,15 @@ void time_Profiler_MallocFree_Empty(int32_t bytes){
 	
 	time=0.0;
 	cycle_avg=0;
-	for(n=0;n<3;n++){
-		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
-		free(source);
-		cycle += PIT_CVAL0;
-		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
-		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
-		num_pit_overflow=0;
-		cycle=0;
-	}
-	cycle_avg /= 3;
+	PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+	free(source);
+	cycle += PIT_CVAL0;
+	PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+	cycle += (num_pit_overflow*240);
+	cycle_avg += cycle;	
+	num_pit_overflow=0;
+	cycle=0;
 	time = cycle_avg * TIME_PER_CYCLE;
-
 	log_Int("CPU cycles of free(): ", cycle_avg);
 	log_Str("\r\n");
 	log_Float("Time of free(): ", time);
@@ -490,16 +470,13 @@ void time_Profiler_MallocFree_Nonempty(int32_t bytes){
 	struct timeval start, finish;
 	int32_t nsec=0;
 	temp = (uint8_t *)malloc(sizeof(uint8_t)*10);
-	for(n=0;n<2;n++){
-		gettimeofday(&start, NULL);
-		source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
-		gettimeofday(&finish, NULL);
-		nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
-	}
-	nsec /= 2;
+	gettimeofday(&start, NULL);
+	source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
+	gettimeofday(&finish, NULL);
+	nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
 	log_Int("Number of bytes: ", bytes);
 	log_Str("\r\n");
-	Log_Int("Time of malloc() with non-empty heap: ", nsec);
+	log_Int("Time of malloc() with non-empty heap: ", nsec);
 	log_Str(" microsec\r\n");
 	free(source);
 
@@ -508,21 +485,15 @@ void time_Profiler_MallocFree_Nonempty(int32_t bytes){
 	int32_t cycle=0;
 	float time=0.0;
 	temp = (uint8_t *)malloc(sizeof(uint8_t)*10);
-	for(n=0;n<3;n++){
-		PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
-		source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
-		cycle += PIT_CVAL0;
-		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
-		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
-		num_pit_overflow=0;
-		cycle=0;
-	}
-	cycle_avg /= 3;
+	PIT_TCTRL0 |= PIT_TCTRL_TEN_MASK;
+	source = (uint8_t *)malloc(sizeof(uint8_t)*bytes);
+	cycle += PIT_CVAL0;
+	PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
+	cycle += (num_pit_overflow*240);
+	cycle_avg += cycle;		
+	num_pit_overflow=0;
+	cycle=0;
 	time = cycle_avg * TIME_PER_CYCLE;
-
 	log_Int("Number of bytes: ", bytes);
 	log_Str("\r\n");
 	log_Int("CPU cycles of malloc() with non-empty heap: ", cycle_avg);
@@ -551,7 +522,7 @@ void time_Profiler_cb_EnDequeue(){
 		nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
 	}
 	nsec /= 2;
-	Log_Int("Time of cb_Enqueue(): ", nsec);
+	log_Int("Time of cb_Enqueue(): ", nsec);
 	log_Str(" microsec\r\n");
 	
 	nsec=0;
@@ -562,8 +533,7 @@ void time_Profiler_cb_EnDequeue(){
 		nsec +=(finish.tv_sec-start.tv_sec)*1000000+(finish.tv_usec-start.tv_usec);
 	}
 	nsec /= 2;
-
-	Log_Int("Time of cb_Dequeue(): ", nsec);
+	log_Int("Time of cb_Dequeue(): ", nsec);
 	log_Str(" microsec\r\n");
 
 #else 
@@ -576,16 +546,13 @@ void time_Profiler_cb_EnDequeue(){
 		cb_Enqueue(cb,1);
 		cycle += PIT_CVAL0;
 		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
 		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
+		cycle_avg += cycle;	
 		num_pit_overflow=0;
 		cycle=0;
 	}
 	cycle_avg /= 3;
 	time = cycle_avg * TIME_PER_CYCLE;
-
 	log_Int("CPU cycles of cb_Enqueue(): ", cycle_avg);
 	log_Str("\r\n");
 	log_Float("Time of cb_Enqueue(): ", time);
@@ -598,16 +565,13 @@ void time_Profiler_cb_EnDequeue(){
 		cb_Dequeue(cb,&temp);
 		cycle += PIT_CVAL0;
 		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
 		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
+		cycle_avg += cycle;	
 		num_pit_overflow=0;
 		cycle=0;
 	}
 	cycle_avg /= 3;
 	time = cycle_avg * TIME_PER_CYCLE;
-
 	log_Int("CPU cycles of cb_Dequeue(): ", cycle_avg);
 	log_Str("\r\n");
 	log_Float("Time of cb_Dequeue(): ", time);
@@ -627,16 +591,14 @@ void time_Profiler_Log(){
 		log_Str("1");
 		cycle += PIT_CVAL0;
 		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
 		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
+		cycle_avg += cycle;	
 		num_pit_overflow=0;
 		cycle=0;
 	}
 	cycle_avg /= 3;
 	time = cycle_avg * TIME_PER_CYCLE;
-  log_Str("\r\n");
+	log_Str("\r\n");
 	log_Int("CPU cycles of log_Str(): ", cycle_avg);
 	log_Str("\r\n");
 	log_Float("Time of cb_log_Str(): ", time);
@@ -649,10 +611,8 @@ void time_Profiler_Log(){
 		log_Str("1111");
 		cycle += PIT_CVAL0;
 		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
 		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
+		cycle_avg += cycle;	
 		num_pit_overflow=0;
 		cycle=0;
 	}
@@ -671,10 +631,8 @@ void time_Profiler_Log(){
 		log_Str("111111111111");
 		cycle += PIT_CVAL0;
 		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
 		cycle += (num_pit_overflow*240);
 		cycle_avg += cycle;
-			
 		num_pit_overflow=0;
 		cycle=0;
 	}
@@ -693,10 +651,8 @@ void time_Profiler_Log(){
 		log_Mem(temp, 15);
 		cycle += PIT_CVAL0;
 		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
 		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
+		cycle_avg += cycle;	
 		num_pit_overflow=0;
 		cycle=0;
 	}
@@ -715,10 +671,8 @@ void time_Profiler_Log(){
 		log_Int("log_Int testing:", 1);
 		cycle += PIT_CVAL0;
 		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
 		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
+		cycle_avg += cycle;	
 		num_pit_overflow=0;
 		cycle=0;
 	}
@@ -737,10 +691,8 @@ void time_Profiler_Log(){
 		log_Float("log_Float testing:", 3.333);
 		cycle += PIT_CVAL0;
 		PIT_TCTRL0 &= ~PIT_TCTRL_TEN_MASK;
-	
 		cycle += (num_pit_overflow*240);
-		cycle_avg += cycle;
-			
+		cycle_avg += cycle;	
 		num_pit_overflow=0;
 		cycle=0;
 	}
@@ -751,7 +703,6 @@ void time_Profiler_Log(){
 	log_Str("\r\n");
 	log_Float("Time of log_Float(): ", time);
 	log_Str(" ns\r\n");
-
 }
 
 #ifdef _BBB
@@ -807,7 +758,7 @@ void time_Profiler_Printf(){
 #endif
 
 void time_Profiler(){
-	/*time_Profiler_Memmove(10);			
+	time_Profiler_Memmove(10);			
 	time_Profiler_Memmove(100);
 	time_Profiler_Memmove(500);
 	time_Profiler_Memmove(1000);
@@ -830,7 +781,7 @@ void time_Profiler(){
 	time_Profiler_MallocFree_Nonempty(100);
 	time_Profiler_MallocFree_Nonempty(500);
 	time_Profiler_MallocFree_Nonempty(1000);
-	time_Profiler_cb_EnDequeue();*/
+	time_Profiler_cb_EnDequeue();
 
 #ifndef _BBB
 	time_Profiler_Log();

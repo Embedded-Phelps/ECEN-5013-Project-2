@@ -1,8 +1,19 @@
+/***************************************************************************
+ *
+ *	Filename: 		circbuf.h
+ *  Description:  	circular buffer function prototypes header file 
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
 #ifndef CIRCBUF_H
 #define CIRCBUF_H
 
 #include "includes.h"
 
+/********************************************************
+ * Circular buffer structure declaration
+ */
 typedef struct CircBuf{
 	uint8_t * buffer;	//pointer to the buffer in memory
 	uint8_t * head;		//pointer to the oldest data
@@ -11,6 +22,9 @@ typedef struct CircBuf{
 	size_t  length;		//current number of items in the buffer
 }CircBuf_t;
 
+/********************************************************
+ * Different circular buffer states 
+ */
 typedef enum CB_e{
 	EMPTY, 
 	FULL, 

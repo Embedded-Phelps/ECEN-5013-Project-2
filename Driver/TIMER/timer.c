@@ -1,31 +1,27 @@
+/***************************************************************************
+ *
+ *	Filename: 		timer.c
+ *  Description:  	KL25Z timer module functions
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
 #include "includes.h"
+
 #define TPM_MODULE    1999
 #define TPM_INIT_VAL   20
 #define TPM_Cn_MODE  (TPM_CnSC_MSB_MASK | TPM_CnSC_ELSA_MASK)
 
-/*********************************************************************************************************
-** Function name:           tpmInit
-** Descriptions:            ptmµÄ³õÊ¼»¯ 
-** input parameters:        none
-** output parameters:       none
-** Returned value:          none
-** Created by:              JiaoLong Liu
-** Created date:            2012-12-12
-**--------------------------------------------------------------------------------------------------------
-** Modified by:             
-** Modified date:           
-*********************************************************************************************************/
 void tpm_Init(void) 
-{
-    //SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK | SIM_SCGC5_PORTD_MASK;          
-    SIM_SCGC6 |= SIM_SCGC6_TPM0_MASK | SIM_SCGC6_TPM2_MASK;              /* Enable clock gate for TPM0 & TPM2                */
-    SIM_SOPT2 |= SIM_SOPT2_PLLFLLSEL_MASK | SIM_SOPT2_TPMSRC(1);         /* Select PLL clock and select TPM clock                 */
+{       
+    SIM_SCGC6 |= SIM_SCGC6_TPM0_MASK | SIM_SCGC6_TPM2_MASK;              /* Enable clock gate for TPM0 & TPM2  */
+    SIM_SOPT2 |= SIM_SOPT2_PLLFLLSEL_MASK | SIM_SOPT2_TPMSRC(1);         /* Select PLL clock and select TPM clock  */
 
-    PORTB_PCR18 = ( 0 | PORT_PCR_MUX(3));                                /* TPM2_CH0 enable on PTB18    */
-    PORTB_PCR19 = ( 0 | PORT_PCR_MUX(3));                                /* TPM2_CH1 enable on PTB19    */
-    PORTD_PCR1  = ( 0 | PORT_PCR_MUX(4));                                /* TPM0_CH1 enable on PTD1     */
+    PORTB_PCR18 = ( 0 | PORT_PCR_MUX(3));                                /* TPM2_CH0 enable on PTB18 */
+    PORTB_PCR19 = ( 0 | PORT_PCR_MUX(3));                                /* TPM2_CH1 enable on PTB19 */
+    PORTD_PCR1  = ( 0 | PORT_PCR_MUX(4));                                /* TPM0_CH1 enable on PTD1  */
 
-    TPM0_MOD  = TPM_MODULE;                                              /* 1999 / 24MHz = 80uS PWM     */
+    TPM0_MOD  = TPM_MODULE;                                              /* 1999 / 24MHz = 80uS PWM  */
     TPM0_C1SC = TPM_Cn_MODE;                                             /* No Interrupts; High True 
                                                                              pulses on Edge Aligned PWM */
     TPM0_C1V  = TPM_INIT_VAL;                                            /* 90% pulse width             */
@@ -44,12 +40,12 @@ void tpm_Init(void)
 }
 
 void pit_Init(void){
-    SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;          /* Enable clock gate to the PIT module  */
-    PIT_MCR &= ~(1 << PIT_MCR_MDIS_SHIFT);    /* Enable clock for standard PIT timer */
+    SIM_SCGC6 |= SIM_SCGC6_PIT_MASK;          	/* Enable clock gate to the PIT module  */
+    PIT_MCR &= ~(1 << PIT_MCR_MDIS_SHIFT);    	/* Enable clock for standard PIT timer */
     PIT_MCR |= PIT_MCR_FRZ_MASK;
-		PIT_LDVAL0 = 240;                         /* Initial value for 10us period  */
-    PIT_TFLG0 |= PIT_TFLG_TIF_MASK;           /* Clear Timer Interrupt Flag  */
-    PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;         /* Enable Timer Interrupt   */
-		NVIC_EnableIRQ(PIT_IRQn);   													
-		NVIC_SetPriority(PIT_IRQn,2);             /* Setting Interrupt priority */
+	PIT_LDVAL0 = 240;                     	 	/* Initial value for 10us period  */
+    PIT_TFLG0 |= PIT_TFLG_TIF_MASK;           	/* Clear Timer Interrupt Flag  */
+    PIT_TCTRL0 |= PIT_TCTRL_TIE_MASK;         	/* Enable Timer Interrupt   */
+	NVIC_EnableIRQ(PIT_IRQn);   													
+	NVIC_SetPriority(PIT_IRQn,2);             	/* Setting Interrupt priority */
 }

@@ -1,19 +1,62 @@
+/***************************************************************************
+ *
+ *	Filename: 		main.c
+ *  Description:  	main file for the project
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
+
 #include "includes.h"
 
-#define SET_LED_GREEN(x)   TPM2_C1V = (x)
-#define SET_LED_RED(x)     TPM2_C0V = (x)
-#define SET_LED_BLUE(x)    TPM0_C1V = (x)
+uint8_t value;
+uint32_t brightness;
 
-extern uint8_t serial_flag;
-extern uint8_t rx_in[5];
-static uint8_t led;
-static int32_t redbrightness,greenbrightness,bluebrightness;
+/* LED color and brightness setting function */
+void led_Ctl(uint8_t color){
+	uint8_t temp=1;
+	uint8_t a[10];
+	uint8_t i=0;
+	
+	while(temp!='\0'){
+		cb_Dequeue(rx_buf, &temp);
+		a[i]=temp;
+		i++;
+	}
+	i=0;
+	a[i]='\0';
+	brightness=my_itoa(a);
+	if(brightness>100)
+		brightness=100;
+	brightness=(uint32_t)2000*(brightness/100)
+	switch(color){
+		case 'r':	SET_LED_RED(brightness);
+					break;
+		case 'g':	SET_LED_GREEN(brightness);
+					break;
+		case 'b':	SET_LED_BLUE(brightness);
+					break;
+		default:;
+	}
+}
+
+/* Echo mode function */
+void echo(){
+	uint8_t temp=1;
+	uint8_t str[100];
+	uint8_t i=0;
+	while(temp!='\0'){
+		cb_Dequeue(rx_buf, &temp);
+		a[i]=temp;
+		i++;
+	}
+	i=0;
+	a[i]='\0';
+	log_Str(str);
+}
 
 int main(){   	
-  int32_t test1=200, test2=4096, test3=123456;
-	float test4=1543.321;
 	
-	enum ledcolor{RED,GREEN,BLUE};
 	/* Enable system interrupt */                                     
 	__enable_irq();
 	
@@ -35,66 +78,65 @@ int main(){
 	
 	/* Initialize PIT */
 	pit_Init();
+	
+#if LOG_TEST
+	int8_t test1=200; 
+	uint16_t test2=4096; 
+	uint32_t test3=123456;
+	float test4=1543.321;
+	log_Str("Testing123, Serial Print Test, no params\n");
+	log_Int("This is an integer number: ", test1);
+	log_Int("\nThis is an integer number: ", test2);
+	log_Int("\nThis is an integer number: ", test3);
+	log_Float("\nThis is a floating point number: ", test4);
+#endif
+	
+#if CIRCBUF_UNITTEST
+	circBuf_UnitTest();
+#endif
 
+#if TIME_PROFILE
 	time_Profiler();
-	/*
-	Log("Testing123, Serial Print Test, no params\r\n", 42);
-	Log_Uint32("This is an integer: ", 20, &test1);
-	Log("\r\n",2);
-	Log_Uint32("This is an integer: ", 20, &test2);
-	Log("\r\n",2);
-	Log_Uint32("This is an integer: ", 20, &test3);
-	Log("\r\n",2);
-	Log_float("This is an integer: ", 20, &test4);
-	Log("\r\n",2);*/
+#endif
 	
-	
-	//Log("Please set LED brightness", 25);
 	while(1){
-		/*if(serial_flag){
-			
-			switch (rx_in[0]){
-				case 'r':
-					led=RED;
-					redbrightness = my_atoi(&rx_in[1]);
-					SET_LED_RED(redbrightness);
-					break;
-				case 'g':
-					led=GREEN;
-					greenbrightness = my_atoi(&rx_in[1]);
-					SET_LED_GREEN(greenbrightness);
-					break;
-				case 'b':
-					led=BLUE;
-					bluebrightness = my_atoi(&rx_in[1]);
-					SET_LED_BLUE(bluebrightness);
-					break;
-				case 'w':
-					if (led==RED)
-						SET_LED_RED(redbrightness+100);
-					if (led==GREEN)
-						SET_LED_GREEN(greenbrightness+100);
-					if(led==BLUE)
-						SET_LED_BLUE(bluebrightness+100);
-					break;
-				case 's':
-					if (led==RED)
-						SET_LED_RED(redbrightness-100);
-					if (led==GREEN)
-						SET_LED_GREEN(greenbrightness-100);
-					if(led==BLUE)
-						SET_LED_BLUE(bluebrightness-100);
-					break;
-				case 'e':
-					Log("\r\nechoing...\r\n", 14);
-					uart0_SendString(&rx_in[1]);
-					Log("\r\n",2);
-				default:;
+	/* checking for signals from terminal */
+		if(cb_IsEmpty(rx_buf)!=EMPTY){
+			cb_Dequeue(rx_buf, &value);
+	/* command to set led color and brightness */
+			if((value=='r')&&(value=='g')&&(value=='b'))
+				led_Ctl(value);
+	/* command to strengthen led brightness */
+			else if (value=='w'){
+				if(brightness>95)
+					brightness=100;
+				else
+					brightness += 5;
+				brightness = (uint32_t)2000*(brightness/100);
+				SET_LED_RED(brightness);
+				SET_LED_GREEN(brightness);
+				SET_LED_BLUE(brightness);
+				cb_Dequeue(rx_buf, &value);  //get rid of the '\0' at the end of the command
 			}
-			my_memzero(rx_in,6);
-			serial_flag=0;
-			Log("\r\n", 2);
-		}*/
+	/* command to weaken led brightness */
+			else if (value=='s'){
+				if(brightness<5)
+					brightness=0;
+				else
+					brightness -= 5;
+				brightness = (uint32_t)2000*(brightness/100);
+				SET_LED_RED(brightness);
+				SET_LED_GREEN(brightness);
+				SET_LED_BLUE(brightness);
+				cb_Dequeue(rx_buf, &value);  //get rid of the '\0' at the end of the command
+			}
+	/* command to enter echo mode */
+			else if (value=='e')
+				echo();
+	/* unrecogonized commands */
+			else
+				log_Str("Command error\n");
+		}
 	}
 }
 

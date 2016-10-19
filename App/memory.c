@@ -1,19 +1,13 @@
-/****************************************************
-* memory.c
-*
-* author: ShuTing Guo
-*
-* date: 9/18/2016
-*
-* Description: provided memory-manupulation functions 
-*              including memory memory zero out, and
-*              memory reverse.
-*
-*****************************************************/
+/***************************************************************************
+ *
+ *	Filename: 		memory.c
+ *  Description:  	memory manipulation functions implementation
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
 
-#include <stdio.h>
-#include <stdint.h>
-#include "memory.h"
+#include "includes.h"
 
 /****************************************************
 * @name: my_memmove
@@ -26,7 +20,6 @@
 *
 * @return:SUCCESS/ERROR 
 */
-
 int8_t my_memmove(uint8_t * src, uint8_t * dst, int32_t length){
     uint32_t i;
     uint8_t * psrc = (uint8_t *) src; 	
@@ -65,7 +58,6 @@ int8_t my_memmove(uint8_t * src, uint8_t * dst, int32_t length){
 *
 * @return:SUCCESS/ERROR 
 */
-
 int8_t my_memzero(uint8_t * src, uint32_t length){
     uint32_t i;
 	if(src == NULL)
@@ -87,7 +79,6 @@ int8_t my_memzero(uint8_t * src, uint32_t length){
 *
 * @return:SUCCESS/ERROR 
 */
-
 int8_t my_reverse(uint8_t * str, uint32_t length){
     uint8_t temp;
     uint32_t i=0;

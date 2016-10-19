@@ -1,22 +1,13 @@
-/****************************************************
-* data.c
-*
-* author: ShuTing Guo
-*
-* date: 9/18/2016
-*
-* Description: provided data-manupulation functions 
-*              including integer to string, string to
-*              integer, memory dump, big-endian/little
-*              endian convertion.
-*
-*****************************************************/
+/***************************************************************************
+ *
+ *	Filename: 		data.c
+ *  Description:  	data manipulation functions implementation
+ *  Author: 		ShuTing Guo  
+ *  Date: 			Oct. 2016
+ *
+ *****************************************************************************/
 
 #include "includes.h"
-
-#ifdef _FRDM
-//#define printf(x) how to define this function to nothing
-#endif /* _FRDM */
 
 /****************************************************
 * @name: my_itoa
@@ -29,7 +20,6 @@
 * 
 * @return: pointer to the string
 */
-
 uint8_t * my_itoa(uint8_t *str, int32_t data, int32_t base){
     int32_t pw, temp;
     uint8_t * result = str;
@@ -55,7 +45,7 @@ uint8_t * my_itoa(uint8_t *str, int32_t data, int32_t base){
 }
 
 /****************************************************
-* @name: my_ftoi
+* @name: my_ftoa
 *
 * @description: Converts a float value to an ASCII string
 *
@@ -64,7 +54,7 @@ uint8_t * my_itoa(uint8_t *str, int32_t data, int32_t base){
 *
 * @return: the integer converted from the string
 */
-int8_t * my_ftoa(int8_t *str, float fdata){	
+uint8_t * my_ftoa(uint8_t *str, float fdata){	
 	int32_t int_part;
 	float float_part;
 	
@@ -117,8 +107,7 @@ int8_t * my_ftoa(int8_t *str, float fdata){
 * 
 * @return: the integer converted from the string
 */
-
-int32_t my_atoi(int8_t *str){
+int32_t my_atoi(uint8_t *str){
     uint8_t neg=1;
     uint32_t n;
 		if (str == NULL)
@@ -135,61 +124,4 @@ int32_t my_atoi(int8_t *str){
         n=10*n+(*str-'0');
     }
     return neg?n:-n;
-}
-
-/****************************************************
-* @name: dump_memory
-*
-* @description: print the hex output of memory locations
-*
-* @param: start -- pointer to the first memory location
-*         length -- bytes of memory to print
-*/
-
-void dump_memory(uint8_t * start, uint32_t length){
-    uint32_t i;
-		if (start == NULL)
-        return;
-    
-    for(i = 0;i < length;i ++)
-        printf("%x", *(start+i));
-    printf("\n");
-}
-
-/****************************************************
-* @name: big_to_little
-*
-* @description: Converts data types from big-endian 
-*               representation to little-endian
-*               
-* @param: data -- the data to be converted
-* 
-* @return: the data converted
-*/
-
-uint32_t big_to_little(uint32_t data){
-     data = (data>>24 & 0xff)     | \
-            (data>>8 & 0xff00)    | \
-            (data<<8 & 0xff0000)  | \
-            (data<<24 & 0xff000000);
-     return data;
-}
-
-/****************************************************
-* @name: little_to_big
-*
-* @description: Converts data types from little-endian 
-*               representation to big-endian
-*               
-* @param: data -- the data to be converted
-* 
-* @return: the data converted
-*/
-
-uint32_t little_to_big(uint32_t data){
-    data = (data>>24 & 0xff)     | \
-	   (data>>8 & 0xff00)    | \
-	   (data<<8 & 0xff0000)  | \
-	   (data<<24 & 0xff000000);
-    return data;
 }
